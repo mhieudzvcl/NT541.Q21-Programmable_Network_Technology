@@ -5,7 +5,7 @@
 
 ## Mô tả đề tài
 
-Đề tài xây dựng ứng dụng mạng chạy trên **Ryu SDN Controller** nhằm thực hiện **kiểm soát truy cập động (Dynamic Access Control)** — tự động thay đổi các luật điều khiển lưu lượng (Flow Rules) theo điều kiện thời gian thực mà không cần can thiệp thủ công.
+Đề tài xây dựng ứng dụng mạng chạy trên **Ryu SDN Controller** nhằm thực hiện **kiểm soát truy cập động (Dynamic Access Control)** - tự động thay đổi các luật điều khiển lưu lượng (Flow Rules) theo điều kiện thời gian thực mà không cần can thiệp thủ công.
 
 ---
 
@@ -108,10 +108,10 @@ Xem thư mục `tests/` để biết cách kích hoạt từng kịch bản.
 
 | # | Tên kịch bản | Mô tả ngắn |
 |---|-------------|------------|
-| 1 | Rate Limiting / DDoS Mitigation | Phát hiện ICMP/SYN flood → DROP IP nguồn 60 giây |
+| 1 | Rate Limiting / DDoS Mitigation | Phát hiện ICMP/SYN flood -> DROP IP nguồn 60 giây |
 | 2 | Time-based Access Control | Cho phép Guest truy cập Web Server chỉ trong giờ hành chính |
-| 3 | MAC/IP Spoofing Detection | Phát hiện MAC di chuyển bất thường → chặn port |
-| 4 | Port Scan Detection | Phát hiện quét port → cách ly Host vào Quarantine |
+| 3 | MAC/IP Spoofing Detection | Phát hiện MAC di chuyển bất thường -> chặn port |
+| 4 | Port Scan Detection | Phát hiện quét port -> cách ly Host vào Quarantine |
 | 5 | NAC / Captive Portal | Host mới chỉ được duyệt web sau khi xác thực thành công |
 
 ---
