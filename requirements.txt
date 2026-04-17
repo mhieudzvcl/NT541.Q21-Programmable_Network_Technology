@@ -1,0 +1,23 @@
+# requirements.txt - Các thư viện Python cần thiết cho Dynamic ACL Controller
+#
+# Cài đặt:
+#   pip3 install -r requirements.txt
+#
+# Lưu ý: Ryu Controller và Mininet cần cài riêng (xem install.sh)
+
+# Ryu Controller
+ryu==4.34                # SDN Controller Framework
+eventlet==0.30.2         # Async networking (phiên bản tương thích với Ryu + Python 3.8+)
+
+# HTTP / REST
+requests>=2.27.0         # Gọi REST API từ các module (Kịch bản 5)
+webob>=1.8.6             # HTTP request/response (dùng bởi Ryu WSGI)
+
+# Tiện ích
+six>=1.16.0              # Tương thích Python 2/3 (Ryu dependency)
+netaddr>=0.8.0           # Xử lý địa chỉ IP/MAC
+msgpack>=1.0.0           # Serialization (Ryu dependency)
+
+# Optional: Monitoring / Visualization
+# flask>=2.0.0           # Nếu muốn xây thêm web dashboard riêng
+# matplotlib>=3.5.0      # Vẽ biểu đồ lưu lượng
