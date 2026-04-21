@@ -15,10 +15,10 @@ Topology đơn giản hơn để test NAC dễ hơn:
   (established) (established)  (auth srv)  (NEW - cần xác thực)
 
 Kịch bản:
-  - h1, h2 đã có trong hệ thống → giao tiếp bình thường
-  - hnew là host mới chưa xác thực → bị hạn chế
+  - h1, h2 đã có trong hệ thống -> giao tiếp bình thường
+  - hnew là host mới chưa xác thực -> bị hạn chế
   - hnew chỉ kết nối được authserver (port 8080)
-  - Sau xác thực → hnew truy cập mọi host
+  - Sau xác thực -> hnew truy cập mọi host
 """
 
 from mininet.net import Mininet
@@ -109,13 +109,13 @@ def build_nac_topology():
     info(f" hnew       : {h_new.IP():15s} MAC={h_new.MAC()} (NEW - chưa xác thực)\n")
     info("=" * 60 + "\n")
     info(" DEMO STEPS:\n")
-    info("  1. h1 ping h2   → SUCCESS (đã biết nhau)\n")
-    info("  2. hnew ping h2 → FAIL (chưa xác thực)\n")
+    info("  1. h1 ping h2   -> SUCCESS (đã biết nhau)\n")
+    info("  2. hnew ping h2 -> FAIL (chưa xác thực)\n")
     info("  3. hnew gọi Auth Server:\n")
     info("     hnew curl -X POST http://10.0.0.200:8080/authenticate \\\n")
     info('       -H "Content-Type: application/json" \\\n')
     info('       -d \'{"mac":"00:00:00:00:00:50","token":"TOKEN_NEW"}\'\n')
-    info("  4. hnew ping h2 → SUCCESS (sau xác thực)\n")
+    info("  4. hnew ping h2 -> SUCCESS (sau xác thực)\n")
     info(" Xem flow table: sh ovs-ofctl dump-flows s1 -O OpenFlow13\n")
     info(" Xem log: tail -f /tmp/dynamic_acl.log\n")
     info("=" * 60 + "\n")

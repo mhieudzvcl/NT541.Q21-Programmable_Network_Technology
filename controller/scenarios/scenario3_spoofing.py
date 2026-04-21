@@ -4,9 +4,9 @@ scenario3_spoofing.py - Kịch bản 3: MAC/IP Spoofing / Flow Anomaly Preventio
 Logic:
   - Mỗi khi học MAC (Packet-In), kiểm tra địa chỉ MAC và IP
   - Nếu MAC xuất hiện trên dpid/port khác trong < SPOOF_TIME_WINDOW giây
-    → Phát hiện MAC Spoofing → DROP toàn bộ traffic vào port đó
+    -> Phat hien MAC Spoofing -> DROP toan bo traffic vao port do
   - Nếu IP xuất hiện với MAC khác trong < SPOOF_TIME_WINDOW giây
-    → Phát hiện IP Spoofing → DROP port đó
+    -> Phat hien IP Spoofing -> DROP port do
   - Luật DROP áp bằng hard_timeout = SPOOF_BLOCK_DURATION giây
 """
 
@@ -44,7 +44,7 @@ class SpoofingDetection:
         """
         dpid = datapath.id
 
-        # Nếu port đã bị chặn → bỏ qua
+        # Nếu port đã bị chặn -> bỏ qua
         if self.mon.is_port_blocked(dpid, in_port):
             return True
 

@@ -3,9 +3,9 @@
 # Mô tả:
 #   1. Kiểm tra kết nối bình thường giữa h1 và h2 (ping thành công)
 #   2. h1 spam ICMP flood vào h2 (vượt ngưỡng 50 gói/giây)
-#   3. Kiểm tra flow table trên s1 → phải có flow DROP cho ip h1
+#   3. Kiểm tra flow table trên s1 -> phải có flow DROP cho ip h1
 #   4. Kiểm tra h1 không ping được h2 nữa
-#   5. Chờ 60 giây → flow DROP tự xóa → h1 ping được h2 bình thường
+#   5. Chờ 60 giây -> flow DROP tự xóa -> h1 ping được h2 bình thường
 #
 # Chạy trong Mininet CLI:
 #   sh /path/to/test_scenario1.sh
@@ -77,7 +77,7 @@ echo "  tail -f /tmp/dynamic_acl.log | grep -E 'DDOS|FLOOD|DROP|BLOCK'"
 echo ""
 
 echo "------------------------------------------------------------"
-echo "[BƯỚC 7] Chờ $BLOCK_DURATION giây → Flow DROP tự hết hạn (hard_timeout)..."
+echo "[BƯỚC 7] Chờ $BLOCK_DURATION giây -> Flow DROP tự hết hạn (hard_timeout)..."
 echo "  sleep $BLOCK_DURATION"
 echo ""
 echo "Sau $BLOCK_DURATION giây:"

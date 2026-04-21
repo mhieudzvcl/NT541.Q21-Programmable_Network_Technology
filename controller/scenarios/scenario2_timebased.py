@@ -4,9 +4,9 @@ scenario2_timebased.py - Kịch bản 2: Time-based Access Control
 Logic:
   - Kiểm tra giờ hệ thống định kỳ (mỗi 30 giây)
   - Trong giờ hành chính (8:00 - 18:00):
-      → Cài flow ALLOW Guest subnet → Web Server (port 80, 443)
+      -> Cai flow ALLOW Guest subnet -> Web Server (port 80, 443)
   - Ngoài giờ hành chính:
-      → Xóa flow ALLOW, cài flow DROP Guest → Web Server
+      -> Xoa flow ALLOW, cai flow DROP Guest -> Web Server
   - Khi Switch kết nối lần đầu, áp ngay trạng thái phù hợp với giờ hiện tại
 """
 
@@ -66,14 +66,14 @@ class TimeBasedACL:
     def _apply_current_policy(self, datapath=None):
         """
         Áp chính sách phù hợp với giờ hiện tại.
-        Nếu datapath=None → áp cho tất cả switch đã đăng ký.
+        Nếu datapath=None -> áp cho tất cả switch đã đăng ký.
         """
         allowed_now = self._is_business_hours()
         targets = [datapath] if datapath else list(self.datapaths.values())
 
         if allowed_now and self.is_allowed is not True:
             logger.info(
-                f"[Scenario2-Time] BUSINESS HOURS → ALLOW Guest→WebServer "
+                f"[Scenario2-Time] BUSINESS HOURS -> ALLOW Guest->WebServer "
                 f"(ports {config.TIMEBASED_WEB_PORTS})"
             )
             for dp in targets:
@@ -82,7 +82,7 @@ class TimeBasedACL:
 
         elif not allowed_now and self.is_allowed is not False:
             logger.info(
-                f"[Scenario2-Time] OFF-HOURS → DROP Guest→WebServer "
+                f"[Scenario2-Time] OFF-HOURS -> DROP Guest->WebServer "
                 f"(ports {config.TIMEBASED_WEB_PORTS})"
             )
             for dp in targets:
@@ -115,11 +115,11 @@ class TimeBasedACL:
             datapath.send_msg(mod)
             logger.info(
                 f"[Scenario2-Time] dpid={datapath.id}: "
-                f"DELETED DROP rule tcp_dst={tcp_dst} → ALLOW traffic to {config.INTERNAL_WEB_SERVER_IP}"
+                f"DELETED DROP rule tcp_dst={tcp_dst} -> ALLOW traffic to {config.INTERNAL_WEB_SERVER_IP}"
             )
 
     def _install_drop_rules(self, datapath):
-        """Xóa flow ALLOW và cài flow DROP: Guest → Web Server (port 80, 443)."""
+        """Xóa flow ALLOW và cài flow DROP: Guest -> Web Server (port 80, 443)."""
         ofp_parser = datapath.ofproto_parser
         ofp = datapath.ofproto
 
@@ -134,7 +134,7 @@ class TimeBasedACL:
             )
             logger.info(
                 f"[Scenario2-Time] dpid={datapath.id}: "
-                f"DROP tcp_dst={tcp_dst} → {config.INTERNAL_WEB_SERVER_IP} (OFF-HOURS)"
+                f"DROP tcp_dst={tcp_dst} -> {config.INTERNAL_WEB_SERVER_IP} (OFF-HOURS)"
             )
 
     # Vòng lặp kiểm tra định kỳ

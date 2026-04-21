@@ -3,7 +3,7 @@
 # Mô tả:
 #   1. h1 giao tiếp bình thường với h2
 #   2. Mô phỏng MAC Spoofing: thay đổi MAC của h3 thành MAC của h1
-#   3. h3 gửi traffic → Controller phát hiện MAC di chuyển bất thường
+#   3. h3 gửi traffic -> Controller phát hiện MAC di chuyển bất thường
 #   4. Controller áp luật DROP port của h3
 
 echo "[KỊCH BẢN 3: MAC/IP Spoofing Detection]"
@@ -44,7 +44,7 @@ echo "  mininet> h3 ping -c 5 $H2_IP"
 echo ""
 echo ">>> Gói từ MAC=$H1_MAC xuất hiện ở port 3 (port của h3)"
 echo ">>> Controller thấy MAC=$H1_MAC vừa ở port 1 (h1), nay ở port 3 (h3)"
-echo ">>> Trong < $SPOOF_TIME_WINDOW giây → phát hiện SPOOF"
+echo ">>> Trong < $SPOOF_TIME_WINDOW giây -> phát hiện SPOOF"
 echo ""
 
 echo "------------------------------------------------------------"

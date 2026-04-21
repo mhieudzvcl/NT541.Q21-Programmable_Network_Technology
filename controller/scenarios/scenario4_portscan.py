@@ -4,8 +4,8 @@ scenario4_portscan.py - Kịch bản 4: Port Scan Detection & Quarantine
 Logic:
   - Theo dõi số cổng TCP đích khác nhau mà một Host kết nối đến trong cửa sổ thời gian
   - Nếu vượt ngưỡng PORTSCAN_THRESHOLD trong PORTSCAN_TIME_WINDOW giây
-    → Phát hiện Port Scan
-    → Cách ly Host vào Quarantine:
+    -> Phat hien Port Scan
+    -> Cach ly Host vao Quarantine:
         * DROP tất cả traffic từ IP đó đi ra ngoài
         * ALLOW traffic từ IP đó đến QUARANTINE_SERVER_IP (nếu cần)
   - Luật cách ly có hard_timeout = QUARANTINE_DURATION giây
@@ -45,7 +45,7 @@ class PortScanDetection:
         :param tcp_dst:  Port TCP đích
         :return: True nếu đây là hành vi quét port và đã áp luật Quarantine
         """
-        # Nếu IP đã bị cách ly → bỏ qua
+        # Nếu IP đã bị cách ly -> bỏ qua
         if self.mon.is_quarantined(ip_src):
             return True
 

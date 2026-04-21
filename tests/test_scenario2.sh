@@ -9,7 +9,7 @@
 #   bash test_scenario2.sh
 
 echo "[KỊCH BẢN 2: Time-based Access Control]"
-echo "Guest (h3) → Web Server (webserver:80)"
+echo "Guest (h3) -> Web Server (webserver:80)"
 echo ""
 
 H3_IP="10.0.0.3"
@@ -29,9 +29,9 @@ echo "  mininet> h3 curl -s --connect-timeout 5 http://$WEBSERVER_IP:80"
 echo ""
 
 if [ "$CURRENT_HOUR" -ge 8 ] && [ "$CURRENT_HOUR" -lt 18 ]; then
-    echo ">>> Đang trong giờ hành chính → ALLOW: kết nối sẽ thành công"
+    echo ">>> Đang trong giờ hành chính -> ALLOW: kết nối sẽ thành công"
 else
-    echo ">>> Ngoài giờ hành chính → DROP: kết nối sẽ bị chặn"
+    echo ">>> Ngoài giờ hành chính -> DROP: kết nối sẽ bị chặn"
 fi
 echo ""
 
@@ -61,7 +61,7 @@ echo "Trong config.py:"
 echo "  TIMEBASED_ALLOW_START = $((CURRENT_HOUR + 1))  # Đặt bắt đầu sau giờ hiện tại"
 echo "  TIMEBASED_ALLOW_END   = $((CURRENT_HOUR + 2))  # Chỉ cho phép 1 tiếng"
 echo ""
-echo "Khởi động lại Controller, chờ 30 giây → xem flow table thay đổi"
+echo "Khởi động lại Controller, chờ 30 giây -> xem flow table thay đổi"
 echo ""
 
 echo "------------------------------------------------------------"

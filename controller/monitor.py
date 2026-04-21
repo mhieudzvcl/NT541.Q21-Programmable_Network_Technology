@@ -18,11 +18,11 @@ class TrafficMonitor:
     Theo dõi lưu lượng mạng và phát hiện các hành vi bất thường.
 
     Dữ liệu được lưu theo cấu trúc:
-    - icmp_counter:  {ip_src: deque([timestamp, ...])}  → đếm ICMP
-    - syn_counter:   {ip_src: deque([timestamp, ...])}  → đếm SYN
-    - port_counter:  {ip_src: {ip_dst: set(ports)}}     → Port Scan
-    - mac_table:     {mac: (dpid, port, timestamp)}     → học MAC/IP
-    - ip_mac_map:    {ip: mac}                          → ánh xạ IP→MAC
+    - icmp_counter:  {ip_src: deque([timestamp, ...])}  -> dem ICMP
+    - syn_counter:   {ip_src: deque([timestamp, ...])}  -> dem SYN
+    - port_counter:  {ip_src: {ip_dst: set(ports)}}     -> Port Scan
+    - mac_table:     {mac: (dpid, port, timestamp)}     -> hoc MAC/IP
+    - ip_mac_map:    {ip: mac}                          -> anh xa IP->MAC
     """
 
     def __init__(self):
@@ -140,8 +140,8 @@ class TrafficMonitor:
 
     def update_ip_location(self, ip, mac, dpid, port):
         """
-        Cập nhật ánh xạ IP→MAC/Port.
-        Trả về True nếu phát hiện IP di chuyển bất thường (≠ MAC cũ).
+        Cập nhật ánh xạ IP->MAC/Port.
+        Tra ve True neu phat hien IP di chuyen bat thuong (khac MAC cu).
         """
         now = time.time()
         old = self.ip_location.get(ip)
@@ -202,7 +202,7 @@ class TrafficMonitor:
         count = self.record_tcp_flow(ip_src, ip_dst, tcp_dst)
         if count > config.PORTSCAN_THRESHOLD:
             logger.warning(
-                f"[Monitor] PORT SCAN detected! ip_src={ip_src} → ip_dst={ip_dst} "
+                f"[Monitor] PORT SCAN detected! ip_src={ip_src} -> ip_dst={ip_dst} "
                 f"unique_ports={count}/{config.PORTSCAN_THRESHOLD} in {config.PORTSCAN_TIME_WINDOW}s"
             )
             return True

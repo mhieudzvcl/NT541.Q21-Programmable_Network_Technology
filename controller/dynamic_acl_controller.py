@@ -3,7 +3,7 @@ dynamic_acl_controller.py - Ryu SDN Controller chính
 
 Ứng dụng Ryu tích hợp tất cả 5 kịch bản Dynamic ACL:
   1. DDoS / Rate Limiting (ICMP Flood, SYN Flood)
-  2. Time-based Access Control (Guest → Web Server)
+  2. Time-based Access Control (Guest -> Web Server)
   3. MAC/IP Spoofing Detection
   4. Port Scan Detection & Quarantine
   5. NAC / Captive Portal (xác thực trước khi cấp quyền)
@@ -109,6 +109,18 @@ class DynamicACLRestAPI(ControllerBase):
                 body=json.dumps({"error": str(e)}).encode('utf-8')
             )
 
+    # GET /mac_table - Xem bảng MAC
+    @route("mac_table", "/mac_table", methods=["GET"])
+    def get_mac_table(self, req, **kwargs):
+        app = self.controller_app
+        body = json.dumps({
+            "mac_to_port": {
+                str(dpid): {mac: port for mac, port in table.items()}
+                for dpid, table in app.mac_to_port.items()
+            }
+        }, indent=2).encode('utf-8')
+        return Response(content_type="application/json", body=body)
+
     # POST /block_ip - Chặn IP thủ công
     @route("block_ip", "/block_ip", methods=["POST"])
     def block_ip(self, req, **kwargs):
@@ -140,18 +152,6 @@ class DynamicACLRestAPI(ControllerBase):
                 content_type="application/json",
                 body=json.dumps({"error": str(e)}).encode('utf-8')
             )
-
-    # GET /mac_table - Xem bảng MAC
-    @route("mac_table", "/mac_table", methods=["GET"])
-    def get_mac_table(self, req, **kwargs):
-        app = self.controller_app
-        body = json.dumps({
-            "mac_to_port": {
-                str(dpid): {mac: port for mac, port in table.items()}
-                for dpid, table in app.mac_to_port.items()
-            }
-        }, indent=2).encode('utf-8')
-        return Response(content_type="application/json", body=body)
 
 # Main Ryu Application
 class DynamicACLController(app_manager.RyuApp):
@@ -242,13 +242,13 @@ class DynamicACLController(app_manager.RyuApp):
     @set_ev_cls(ofp_event.EventOFPPacketIn, MAIN_DISPATCHER)
     def packet_in_handler(self, ev):
         """
-        Xử lý gói tin không khớp flow nào trên switch (table-miss → Packet-In).
+        Xử lý gói tin không khớp flow nào trên switch (table-miss -> Packet-In).
 
         Luồng xử lý:
         1. Parse gói tin
         2. Học địa chỉ MAC (L2 learning)
         3. Chạy các module kiểm tra bảo mật theo thứ tự
-        4. Nếu gói hợp lệ → cài flow và forward
+        4. Nếu gói hợp lệ -> cài flow và forward
         """
         msg = ev.msg
         datapath = msg.datapath
@@ -294,7 +294,7 @@ class DynamicACLController(app_manager.RyuApp):
         # (để phát hiện MAC di chuyển bất thường)
         if self.spoofing.handle_packet(datapath, in_port, eth_src, ip_src):
             logger.warning(
-                f"[Controller] SPOOF DETECTED → DROP: "
+                f"[Controller] SPOOF DETECTED -> DROP: "
                 f"eth_src={eth_src} ip_src={ip_src} port={in_port}"
             )
             return  # Dừng xử lý, gói bị DROP
@@ -302,7 +302,7 @@ class DynamicACLController(app_manager.RyuApp):
         # BƯỚC 3: Kịch bản 5 - NAC: kiểm tra Host mới
         # (ENABLE_NAC được kiểm tra bên trong handle_new_host)
         if eth_src not in self.mac_to_port.get(dpid, {}):
-            # Host mới → kiểm tra NAC
+            # Host mới -> kiểm tra NAC
             if self.nac.handle_new_host(datapath, in_port, eth_src, ip_src):
                 logger.info(
                     f"[Controller] NAC RESTRICTED: eth_src={eth_src} "
@@ -317,7 +317,7 @@ class DynamicACLController(app_manager.RyuApp):
         if ip_pkt:
             if self.ddos.handle_packet(datapath, in_port, pkt):
                 logger.warning(
-                    f"[Controller] DDOS DETECTED → DROP: ip_src={ip_src}"
+                    f"[Controller] DDOS DETECTED -> DROP: ip_src={ip_src}"
                 )
                 return  # Gói bị DROP bởi flow entry đã cài
 
@@ -330,7 +330,7 @@ class DynamicACLController(app_manager.RyuApp):
                     ip_src, ip_dst, tcp_pkt.dst_port
                 ):
                     logger.warning(
-                        f"[Controller] PORT SCAN DETECTED → QUARANTINE: ip_src={ip_src}"
+                        f"[Controller] PORT SCAN DETECTED -> QUARANTINE: ip_src={ip_src}"
                     )
                     return  # Gói bị DROP/Quarantine
 
@@ -338,7 +338,7 @@ class DynamicACLController(app_manager.RyuApp):
         if eth_dst in self.mac_to_port[dpid]:
             out_port = self.mac_to_port[dpid][eth_dst]
         else:
-            # Chưa biết MAC đích → Flood
+            # Chưa biết MAC đích -> Flood
             out_port = ofp.OFPP_FLOOD
 
         actions = [ofp_parser.OFPActionOutput(out_port)]

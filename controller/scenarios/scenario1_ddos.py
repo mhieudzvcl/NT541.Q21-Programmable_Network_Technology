@@ -3,9 +3,9 @@ scenario1_ddos.py - Kịch bản 1: Rate Limiting / DDoS Mitigation
 
 Logic:
   - Mỗi khi nhận Packet-In từ switch, kiểm tra gói ICMP hoặc TCP SYN
-  - Nếu số gói từ một IP vượt ngưỡng trong 1 giây → DROP 60 giây
+  - Nếu số gói từ một IP vượt ngưỡng trong 1 giây -> DROP 60 giây
   - Flow entry DROP được đẩy xuống switch với hard_timeout = 60s
-  - Sau 60 giây, switch tự xóa flow → mạng trở lại bình thường
+  - Sau 60 giây, switch tự xóa flow -> mạng trở lại bình thường
 """
 
 import logging
@@ -48,7 +48,7 @@ class DDoSMitigation:
 
         ip_src = ip_layer.src
 
-        # Nếu IP đã bị chặn → bỏ qua (flow trên switch đã DROP)
+        # Nếu IP đã bị chặn -> bỏ qua (flow trên switch đã DROP)
         if self.mon.is_ip_blocked(ip_src):
             return True
 
@@ -123,7 +123,7 @@ class DDoSMitigation:
         self.mon.blocked_ips.pop(ip_src, None)
         # Reset bộ đếm ICMP để kỳ flood tiếp theo được đếm sạch từ đầu
         self.mon.icmp_counter.pop(ip_src, None)
-        logger.info(f"[Scenario1-DDoS] Block expired: ip={ip_src} dpid={dpid} \u2192 IP is now FREE again")
+        logger.info(f"[Scenario1-DDoS] Block expired: ip={ip_src} dpid={dpid} -> IP is now FREE again")
 
     def get_status(self):
         """Trả về trạng thái hiện tại của module."""

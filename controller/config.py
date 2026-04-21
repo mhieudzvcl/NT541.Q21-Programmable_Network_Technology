@@ -50,7 +50,7 @@ LOG_FILE  = "/tmp/dynamic_acl.log"
 
 # Cấu hình Idle/Hard Timeout
 # Dùng cho các flow entry bình thường (học MAC)
-NORMAL_IDLE_TIMEOUT = 300        # 5 phút không có traffic → xóa flow
+NORMAL_IDLE_TIMEOUT = 300        # 5 phút không có traffic -> xóa flow
 NORMAL_HARD_TIMEOUT = 0          # 0 = không giới hạn hard timeout
 
 # Dùng cho các flow DROP (kịch bản 1, 3, 4)

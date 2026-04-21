@@ -123,7 +123,7 @@ NMAP_VER=$(nmap --version 2>/dev/null | head -1 || echo "NOT INSTALLED")
 echo "  nmap        : $NMAP_VER"
 
 echo ""
-echo -e "${GREEN}✓ Cài đặt hoàn thành!${NC}"
+echo -e "${GREEN}[OK] Cài đặt hoàn thành!${NC}"
 echo ""
 echo "  Để chạy project:"
 echo ""

@@ -39,8 +39,8 @@ class ACLManager:
         :param priority:      Độ ưu tiên của flow entry
         :param match:         OFPMatch object
         :param actions:       Danh sách action (rỗng = DROP)
-        :param idle_timeout:  Xóa flow nếu không có traffic sau N giây (0=∞)
-        :param hard_timeout:  Xóa flow sau N giây tuyệt đối (0=∞)
+        :param idle_timeout:  Xóa flow nếu không có traffic sau N giây (0=vô hạn)
+        :param hard_timeout:  Xóa flow sau N giây tuyệt đối (0=vô hạn)
         :param command:       OFPFC_ADD / OFPFC_DELETE / OFPFC_MODIFY (mặc định ADD)
         :param table_id:      ID bảng flow (mặc định 0)
         :param cookie:        Cookie để nhận dạng flow (mặc định 0)
@@ -54,7 +54,7 @@ class ACLManager:
         inst = []
         if actions:
             inst = [ofp_parser.OFPInstructionActions(ofp.OFPIT_APPLY_ACTIONS, actions)]
-        # Nếu actions rỗng → không có instruction → DROP
+        # Nếu actions rỗng -> không có instruction -> DROP
 
         mod = ofp_parser.OFPFlowMod(
             datapath=datapath,
@@ -132,7 +132,7 @@ class ACLManager:
         pri  = priority if priority is not None else config.DROP_PRIORITY
 
         match = ofp_parser.OFPMatch(eth_type=0x0800, ipv4_src=ip_src)
-        # actions = [] → DROP
+        # actions = [] -> DROP
         logger.warning(
             f"[ACLManager] DROP IP: dpid={datapath.id} "
             f"ip_src={ip_src} hard_timeout={hard}s"
@@ -264,7 +264,7 @@ class ACLManager:
     # Thêm table-miss flow entry (Packet-In cho controller)
     def add_table_miss_flow(self, datapath):
         """
-        Thêm table-miss entry: gói tin không khớp flow nào → gửi lên Controller.
+        Thêm table-miss entry: gói tin không khớp flow nào -> gửi lên Controller.
         """
         ofp = datapath.ofproto
         ofp_parser = datapath.ofproto_parser

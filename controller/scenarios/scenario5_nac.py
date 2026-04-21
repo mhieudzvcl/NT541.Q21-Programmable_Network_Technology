@@ -42,7 +42,7 @@ class NACPortal:
         }
         # Tập hợp các MAC đã bị hạn chế (chờ xác thực)
         self.restricted_hosts = set()
-        # Ánh xạ MAC → IP (cập nhật khi học)
+        # Ánh xạ MAC -> IP (cập nhật khi học)
         self.mac_to_ip = {}
         # Lưu datapath cho mỗi host: {mac: (datapath, in_port)}
         self.host_datapath = {}
@@ -62,7 +62,7 @@ class NACPortal:
         if not getattr(config, "ENABLE_NAC", False):
             return False
 
-        # Host đã xác thực → cho qua
+        # Host đã xác thực -> cho qua
         if eth_src in self.authenticated_hosts:
             return False
 
@@ -71,11 +71,11 @@ class NACPortal:
         if ip_src:
             self.mac_to_ip[eth_src] = ip_src
 
-        # Nếu chưa hạn chế → áp luật hạn chế
+        # Nếu chưa hạn chế -> áp luật hạn chế
         if eth_src not in self.restricted_hosts:
             logger.info(
                 f"[Scenario5-NAC] NEW HOST: mac={eth_src} ip={ip_src} "
-                f"dpid={datapath.id}/port={in_port} → RESTRICTED"
+                f"dpid={datapath.id}/port={in_port} -> RESTRICTED"
             )
             self._apply_restriction(datapath, in_port, eth_src, ip_src)
             self.restricted_hosts.add(eth_src)
@@ -85,16 +85,16 @@ class NACPortal:
     def _apply_restriction(self, datapath, in_port, eth_src, ip_src):
         """
         Áp luật hạn chế:
-        1. ALLOW: Host → Auth Server (TCP port AUTH_SERVER_PORT)
-        2. ALLOW: Host → DNS (UDP port 53) - để resolve domain
-        3. DROP:  Host → * (tất cả traffic khác, ưu tiên thấp hơn ALLOW)
+        1. ALLOW: Host -> Auth Server (TCP port AUTH_SERVER_PORT)
+        2. ALLOW: Host -> DNS (UDP port 53) - để resolve domain
+        3. DROP:  Host -> * (tất cả traffic khác, ưu tiên thấp hơn ALLOW)
 
         Lưu ý: thứ tự cài đặt QUAN TRỌNG - cài ALLOW trước DROP để tránh race.
         """
         ofp_parser = datapath.ofproto_parser
         ofp = datapath.ofproto
 
-        # Luật 1: ALLOW Host → Auth Server TCP (priority cao nhất)
+        # Luật 1: ALLOW Host -> Auth Server TCP (priority cao nhất)
         match_allow_auth = ofp_parser.OFPMatch(
             in_port=in_port,
             eth_src=eth_src,
@@ -116,7 +116,7 @@ class NACPortal:
         )
         datapath.send_msg(allow_auth_mod)
 
-        # Luật 2: ALLOW Host → DNS UDP (để resolve hostname)
+        # Luật 2: ALLOW Host -> DNS UDP (để resolve hostname)
         match_dns = ofp_parser.OFPMatch(
             in_port=in_port,
             eth_src=eth_src,
@@ -153,7 +153,7 @@ class NACPortal:
 
         logger.info(
             f"[Scenario5-NAC] Restricted Host mac={eth_src}: "
-            f"ALLOW only → {config.AUTH_SERVER_IP}:{config.AUTH_SERVER_PORT}"
+            f"ALLOW only -> {config.AUTH_SERVER_IP}:{config.AUTH_SERVER_PORT}"
         )
         logger.info(
             f"[Scenario5-NAC] Hint: authenticate via "
@@ -166,7 +166,7 @@ class NACPortal:
     def authenticate_host(self, mac, token=None):
         """
         Gọi REST API của Auth Server để xác thực Host.
-        Nếu thành công → gỡ hạn chế và cấp quyền đầy đủ.
+        Nếu thành công -> gỡ hạn chế và cấp quyền đầy đủ.
         QUAN TRỌNG: Hàm này BLOCKING - gọi trong hub.spawn() để không block event loop.
 
         :param mac:   MAC address của Host
@@ -277,7 +277,7 @@ class NACPortal:
 
             logger.info(
                 f"[Scenario5-NAC] - FULL ACCESS GRANTED for mac={mac} "
-                f"on dpid={datapath.id}/port={in_port} → All NAC rules REMOVED"
+                f"on dpid={datapath.id}/port={in_port} -> All NAC rules REMOVED"
             )
         except Exception as e:
             logger.error(f"[Scenario5-NAC] Exception in _grant_full_access: {e}")
@@ -289,7 +289,7 @@ class NACPortal:
         Auth Server đã xác thực xong rồi mới gọi đến đây.
         Nên ta chỉ cần grant_full_access luôn, không gọi ngược lại auth server.
         """
-        logger.info(f"[Scenario5-NAC] Auth callback received for mac={mac} → granting access")
+        logger.info(f"[Scenario5-NAC] Auth callback received for mac={mac} -> granting access")
         # Chạy trong greenthread để không block Ryu event loop
         hub.spawn(self._grant_full_access, mac)
         return {"mac": mac, "authenticated": True, "status": "access_granted"}
