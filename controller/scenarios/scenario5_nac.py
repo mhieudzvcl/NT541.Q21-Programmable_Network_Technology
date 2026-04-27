@@ -136,6 +136,24 @@ class NACPortal:
         )
         datapath.send_msg(allow_dns_mod)
 
+        # Luật 2.5: ALLOW ARP (để phân giải MAC của Auth Server)
+        match_arp = ofp_parser.OFPMatch(
+            in_port=in_port,
+            eth_src=eth_src,
+            eth_type=0x0806  # ARP
+        )
+        allow_arp_mod = ofp_parser.OFPFlowMod(
+            datapath=datapath,
+            priority=config.DROP_PRIORITY + 10,
+            match=match_arp,
+            instructions=[ofp_parser.OFPInstructionActions(
+                ofp.OFPIT_APPLY_ACTIONS, actions_allow
+            )],
+            idle_timeout=0,
+            hard_timeout=0
+        )
+        datapath.send_msg(allow_arp_mod)
+
         # Luật 3: DROP tất cả traffic khác từ Host (priority thấp hơn ALLOW)
         match_drop = ofp_parser.OFPMatch(
             in_port=in_port,
@@ -259,6 +277,19 @@ class NACPortal:
                 match=match_dns
             )
             datapath.send_msg(del_dns_mod)
+
+            match_arp = ofp_parser.OFPMatch(
+                in_port=in_port, eth_src=mac, eth_type=0x0806
+            )
+            del_arp_mod = ofp_parser.OFPFlowMod(
+                datapath=datapath,
+                command=ofp.OFPFC_DELETE_STRICT,
+                priority=config.DROP_PRIORITY + 10,
+                out_port=ofp.OFPP_ANY,
+                out_group=ofp.OFPG_ANY,
+                match=match_arp
+            )
+            datapath.send_msg(del_arp_mod)
 
             # Ngoài ra gửi lệnh DELETE chung để phòng hờ
             match_all = ofp_parser.OFPMatch(in_port=in_port, eth_src=mac)
