@@ -13,8 +13,8 @@ DDOS_BLOCK_DURATION  = 60        # Thời gian chặn (giây) khi phát hiện D
 DDOS_MONITOR_INTERVAL = 1        # Chu kỳ kiểm tra (giây)
 
 # Kịch bản 2: Time-based Access Control
-TIMEBASED_ALLOW_START = 8        # Giờ bắt đầu cho phép (8:00 AM)
-TIMEBASED_ALLOW_END   = 18       # Giờ kết thúc cho phép (6:00 PM)
+TIMEBASED_ALLOW_START = 8        # Giờ bắt đầu cho phép (Mặc định là 8:00 AM)
+TIMEBASED_ALLOW_END   = 18       # Giờ kết thúc cho phép (Mặc định là 6:00 PM)
 TIMEBASED_CHECK_INTERVAL = 30    # Chu kỳ kiểm tra giờ (giây)
 TIMEBASED_WEB_PORTS = [80, 443]  # Cổng Web được kiểm soát
 # Subnet của mạng Guest (sẽ được áp luật time-based)
