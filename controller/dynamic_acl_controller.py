@@ -153,6 +153,19 @@ class DynamicACLRestAPI(ControllerBase):
         }, indent=2).encode('utf-8')
         return Response(content_type="application/json", body=body)
 
+    # DELETE /mac_table - Reset bảng MAC (dùng khi demo lại từ đầu)
+    @route("mac_table_reset", "/mac_table", methods=["DELETE"])
+    def reset_mac_table(self, req, **kwargs):
+        app = self.controller_app
+        for dpid in app.mac_to_port:
+            app.mac_to_port[dpid].clear()
+        logger.info("[REST DELETE /mac_table] MAC table cleared for all switches")
+        body = json.dumps({
+            "message": "MAC table cleared",
+            "switches": list(app.mac_to_port.keys())
+        }, indent=2).encode('utf-8')
+        return Response(content_type="application/json", body=body)
+
 # Main Ryu Application
 class DynamicACLController(app_manager.RyuApp):
     """
