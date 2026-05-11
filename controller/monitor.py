@@ -35,6 +35,15 @@ class TrafficMonitor:
         self.mac_location = {}
         # {ip:  {"dpid": ..., "port": ..., "mac": ..., "last_seen": ...}}
         self.ip_location  = {}
+        # Port HỢP LỆ GỐC: lần đầu tiên thấy MAC này (bất biến, chỉ reset khi restart).
+        # Dùng làm tham chiếu khi phát hiện spoof thay vì dùng old_location
+        # (vì old_location có thể đã bị nhiễm bởi gói spoof không bị detect).
+        # {mac: {"dpid": ..., "port": ...}}
+        self.mac_first_port = {}
+        # Persistent binding: sau khi phát hiện spoof lần đầu, lưu port hợp lệ
+        # để chặn attacker kể cả sau khi time-window hết.
+        # {mac: {"dpid": ..., "port": ...}}
+        self.mac_legitimate_port = {}
 
         # Kịch bản 4: Port Scan
         # {ip_src: deque([(timestamp, ip_dst, tcp_dst), ...])}
@@ -107,14 +116,39 @@ class TrafficMonitor:
         """
         Cập nhật vị trí MAC. Trả về (is_spoofed: bool, old_location: dict).
 
-        Phát hiện spoofing khi MAC xuất hiện trên port/dpid khác
-        trong khoảng thời gian < SPOOF_TIME_WINDOW giây.
+        Phát hiện spoofing theo 2 tầng:
+          1. Persistent binding: MAC đã từng bị flag → luôn kiểm tra với port đầu tiên.
+          2. Time-window: MAC di chuyển port trong < SPOOF_TIME_WINDOW giây.
+
+        FIX: Dùng mac_first_port (port lần đầu thấy MAC) làm tham chiếu hợp lệ.
+        Không dùng old_location vì có thể bị nhiễm nếu attacker chờ > time_window.
+        Khi phát hiện spoof → KHÔNG cập nhật mac_location để tránh false positive.
         """
         now = time.time()
         old = self.mac_location.get(mac)
 
+        # --- Ghi nhận lần đầu thấy MAC (bất biến) ---
+        if mac not in self.mac_first_port:
+            self.mac_first_port[mac] = {"dpid": dpid, "port": port}
+            logger.info(f"[Monitor] MAC {mac} first seen at dpid={dpid}/port={port}")
+
+        first = self.mac_first_port[mac]
+
+        # --- Tầng 1: Persistent binding (sau khi spoof đã bị phát hiện lần đầu) ---
+        legitimate = self.mac_legitimate_port.get(mac)
+        if legitimate:
+            legit_same = (legitimate["dpid"] == dpid and legitimate["port"] == port)
+            if not legit_same:
+                logger.warning(
+                    f"[Monitor] MAC SPOOFING (persistent)! mac={mac} "
+                    f"legitimate port=dpid={legitimate['dpid']}/port={legitimate['port']} "
+                    f"but packet arrived at dpid={dpid}/port={port}"
+                )
+                # KHÔNG cập nhật mac_location
+                return True, old
+
+        # --- Tầng 2: Time-window (phát hiện lần đầu) ---
         if old:
-            # Nếu MAC di chuyển sang dpid/port khác trong thời gian ngắn
             same_location = (old["dpid"] == dpid and old["port"] == port)
             time_diff = now - old["last_seen"]
 
@@ -124,19 +158,32 @@ class TrafficMonitor:
                     f"moved from dpid={old['dpid']}/port={old['port']} "
                     f"to dpid={dpid}/port={port} in {time_diff:.2f}s"
                 )
-                # Cập nhật vị trí mới
-                self.mac_location[mac] = {
-                    "dpid": dpid, "port": port,
-                    "ip": ip, "last_seen": now
-                }
+                # Lưu mac_first_port làm legitimate (không dùng old vì có thể bị nhiễm)
+                if mac not in self.mac_legitimate_port:
+                    self.mac_legitimate_port[mac] = {
+                        "dpid": first["dpid"], "port": first["port"]
+                    }
+                    logger.info(
+                        f"[Monitor] MAC {mac} bound to FIRST-SEEN legitimate "
+                        f"dpid={first['dpid']}/port={first['port']} permanently."
+                    )
+                # KHÔNG cập nhật mac_location
                 return True, old
 
-        # Lưu vị trí mới (hoặc lần đầu thấy)
+        # Cập nhật vị trí mới (host hợp lệ)
         self.mac_location[mac] = {
             "dpid": dpid, "port": port,
             "ip": ip, "last_seen": now
         }
         return False, old
+
+    def clear_mac_binding(self, mac):
+        """
+        Xóa persistent binding của MAC (dùng khi admin xác nhận host di chuyển hợp lệ).
+        """
+        if mac in self.mac_legitimate_port:
+            del self.mac_legitimate_port[mac]
+            logger.info(f"[Monitor] Cleared persistent binding for MAC {mac}")
 
     def update_ip_location(self, ip, mac, dpid, port):
         """
@@ -243,6 +290,7 @@ class TrafficMonitor:
                 for ip, exp in self.quarantined.items()
                 if exp > now
             },
-            "mac_locations": dict(self.mac_location),
-            "ip_locations":  dict(self.ip_location),
+            "mac_locations":      dict(self.mac_location),
+            "ip_locations":       dict(self.ip_location),
+            "mac_legitimate_ports": dict(self.mac_legitimate_port),
         }
