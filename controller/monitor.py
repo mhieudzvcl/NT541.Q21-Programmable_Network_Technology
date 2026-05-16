@@ -200,9 +200,7 @@ class TrafficMonitor:
                     f"[Monitor] IP SPOOFING! ip={ip} "
                     f"changed MAC from {old['mac']} to {mac} in {time_diff:.2f}s"
                 )
-                self.ip_location[ip] = {
-                    "mac": mac, "dpid": dpid, "port": port, "last_seen": now
-                }
+                # KHÔNG lưu đè self.ip_location bằng MAC của kẻ tấn công
                 return True, old
 
         self.ip_location[ip] = {

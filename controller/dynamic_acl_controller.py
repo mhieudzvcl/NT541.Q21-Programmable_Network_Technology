@@ -153,7 +153,7 @@ class DynamicACLRestAPI(ControllerBase):
         }, indent=2).encode('utf-8')
         return Response(content_type="application/json", body=body)
 
-    # DELETE /mac_table - Reset bảng MAC (dùng khi demo lại từ đầu)
+    # DELETE /mac_table - Reset bảng MAC 
     @route("mac_table_reset", "/mac_table", methods=["DELETE"])
     def reset_mac_table(self, req, **kwargs):
         app = self.controller_app
@@ -291,8 +291,15 @@ class DynamicACLController(app_manager.RyuApp):
         icmp_pkt = pkt.get_protocol(icmp_lib.icmp)
         arp_pkt  = pkt.get_protocol(arp.arp)
 
-        ip_src = ip_pkt.src if ip_pkt else None
-        ip_dst = ip_pkt.dst if ip_pkt else None
+        if ip_pkt:
+            ip_src = ip_pkt.src
+            ip_dst = ip_pkt.dst
+        elif arp_pkt:
+            ip_src = arp_pkt.src_ip
+            ip_dst = arp_pkt.dst_ip
+        else:
+            ip_src = None
+            ip_dst = None
 
         logger.info(
             f"[PacketIn] dpid={dpid} in_port={in_port} "
@@ -362,7 +369,7 @@ class DynamicACLController(app_manager.RyuApp):
             if not icmp_pkt:
                 # Cài flow L2 để lần sau switch tự xử lý (Cấu hình cứng ở phần cứng)
                 self.acl_manager.add_forward_flow(
-                    datapath, in_port, eth_dst, out_port
+                    datapath, in_port, eth_src, eth_dst, out_port
                 )
 
         # BƯỚC 8: Gửi gói tin hiện tại ra cổng đích (Packet-Out)

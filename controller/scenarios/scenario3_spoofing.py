@@ -58,14 +58,9 @@ class SpoofingDetection:
                 f"was at dpid={old_mac_loc['dpid']}/port={old_mac_loc['port']}, "
                 f"now at dpid={dpid}/port={in_port}"
             )
-            # Chặn cả port cũ lẫn port mới
+            # Chỉ chặn port của kẻ tấn công (in_port), KHÔNG chặn port của nạn nhân
             self._block_port(datapath, in_port,
                              reason=f"MAC_SPOOF mac={eth_src}")
-            # Tìm switch cũ để chặn port cũ
-            self._block_port_by_dpid(
-                old_mac_loc["dpid"], old_mac_loc["port"],
-                reason=f"MAC_SPOOF mac={eth_src} (old location)"
-            )
             return True
 
         # Kiểm tra IP Spoofing (nếu có IP)
@@ -109,16 +104,7 @@ class SpoofingDetection:
             dpid, port
         )
 
-    def _block_port_by_dpid(self, dpid, port, reason="SPOOF"):
-        """Tìm datapath theo dpid và áp luật DROP port. (Cần truyền datapaths từ controller)."""
-        # Controller sẽ inject datapaths_map vào sau khi khởi tạo
-        if hasattr(self, 'datapaths_map') and dpid in self.datapaths_map:
-            self._block_port(self.datapaths_map[dpid], port, reason=reason)
-        else:
-            logger.warning(
-                f"[Scenario3-Spoof] Cannot block old port: "
-                f"dpid={dpid} not found in datapaths_map"
-            )
+
 
     def set_datapaths_map(self, datapaths_map):
         """

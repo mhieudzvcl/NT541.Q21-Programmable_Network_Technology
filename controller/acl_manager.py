@@ -70,18 +70,19 @@ class ACLManager:
         datapath.send_msg(mod)
 
     # Luật chuyển tiếp bình thường (FORWARD)
-    def add_forward_flow(self, datapath, in_port, eth_dst, out_port,
+    def add_forward_flow(self, datapath, in_port, eth_src, eth_dst, out_port,
                          idle_timeout=None, hard_timeout=None):
         """
-        Thêm flow entry chuyển tiếp L2 (theo địa chỉ MAC đích).
+        Thêm flow entry chuyển tiếp L2. Bắt buộc kiểm tra cả MAC nguồn để chống L2 Bypass.
 
         :param datapath:  Switch
         :param in_port:   Cổng vào
+        :param eth_src:   MAC nguồn
         :param eth_dst:   MAC đích
         :param out_port:  Cổng ra
         """
         ofp_parser = datapath.ofproto_parser
-        match = ofp_parser.OFPMatch(in_port=in_port, eth_dst=eth_dst)
+        match = ofp_parser.OFPMatch(in_port=in_port, eth_src=eth_src, eth_dst=eth_dst)
         actions = [ofp_parser.OFPActionOutput(out_port)]
         idle = idle_timeout if idle_timeout is not None else config.NORMAL_IDLE_TIMEOUT
         hard = hard_timeout if hard_timeout is not None else config.NORMAL_HARD_TIMEOUT
