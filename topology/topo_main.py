@@ -62,37 +62,38 @@ def build_topology():
     info("*** Thêm các Host\n")
 
     # Host thông thường
-    h1 = net.addHost("h1", ip="10.0.0.1/24", mac="00:00:00:00:00:01")
-    h2 = net.addHost("h2", ip="10.0.0.2/24", mac="00:00:00:00:00:02")
+    h1 = net.addHost("h1", ip="10.0.0.1/16", mac="00:00:00:00:00:01")
+    h2 = net.addHost("h2", ip="10.0.0.2/16", mac="00:00:00:00:00:02")
 
     # Host Guest (dùng Kịch bản 2 - Time-based ACL)
-    h3 = net.addHost("h3", ip="10.0.0.3/24", mac="00:00:00:00:00:03")
+    # Cấu hình thuộc dải 10.0.2.x/16 để khớp với config.GUEST_SUBNET (10.0.2.0)
+    h3 = net.addHost("h3", ip="10.0.2.3/16", mac="00:00:00:00:00:03")
 
     # Web Server nội bộ
     h_web = net.addHost(
         "webserver",
-        ip="10.0.0.100/24",
+        ip="10.0.0.100/16",
         mac="00:00:00:00:00:64"
     )
 
     # Authentication Server (Kịch bản 5 - NAC)
     h_auth = net.addHost(
         "authserver",
-        ip="10.0.0.200/24",
+        ip="10.0.0.200/16",
         mac="00:00:00:00:00:c8"
     )
 
     # Quarantine Server (Kịch bản 4 - Port Scan)
     h_quarantine = net.addHost(
         "quarantine",
-        ip="10.0.0.254/24",
+        ip="10.0.0.254/16",
         mac="00:00:00:00:00:fe"
     )
 
     # Host lạ (Kịch bản 5 - NAC, sẽ cần xác thực)
     h_new = net.addHost(
         "hnew",
-        ip="10.0.0.50/24",
+        ip="10.0.0.50/16",
         mac="00:00:00:00:00:50"
     )
 

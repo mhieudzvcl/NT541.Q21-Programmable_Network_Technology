@@ -96,12 +96,16 @@ class TimeBasedACL:
         """
         ofp_parser = datapath.ofproto_parser
         ofp = datapath.ofproto
+        
+        guest_ip = config.GUEST_SUBNET.split('/')[0]
+        guest_subnet_tuple = (guest_ip, "255.255.255.0")
 
         for tcp_dst in config.TIMEBASED_WEB_PORTS:
             # Xóa flow DROP cũ (nếu có)
             match = ofp_parser.OFPMatch(
                 eth_type=0x0800,
                 ip_proto=6,
+                ipv4_src=guest_subnet_tuple,
                 ipv4_dst=config.INTERNAL_WEB_SERVER_IP,
                 tcp_dst=tcp_dst
             )
@@ -115,18 +119,22 @@ class TimeBasedACL:
             datapath.send_msg(mod)
             logger.info(
                 f"[Scenario2-Time] dpid={datapath.id}: "
-                f"DELETED DROP rule tcp_dst={tcp_dst} → ALLOW traffic to {config.INTERNAL_WEB_SERVER_IP}"
+                f"DELETED DROP rule tcp_dst={tcp_dst} → ALLOW Guest {config.GUEST_SUBNET} to {config.INTERNAL_WEB_SERVER_IP}"
             )
 
     def _install_drop_rules(self, datapath):
         """Xóa flow ALLOW và cài flow DROP: Guest → Web Server (port 80, 443)."""
         ofp_parser = datapath.ofproto_parser
         ofp = datapath.ofproto
+        
+        guest_ip = config.GUEST_SUBNET.split('/')[0]
+        guest_subnet_tuple = (guest_ip, "255.255.255.0")
 
         for tcp_dst in config.TIMEBASED_WEB_PORTS:
             # Cài flow DROP (hô thay thế bất kỳ flow cũ nào có cùng match)
             self.acl.add_tcp_drop_flow(
                 datapath,
+                ip_src=guest_subnet_tuple,
                 ip_dst=config.INTERNAL_WEB_SERVER_IP,
                 tcp_dst=tcp_dst,
                 block_duration=0,  # 0 = vô thời hạn (sẽ bị xóa khi vào giờ)
@@ -134,7 +142,7 @@ class TimeBasedACL:
             )
             logger.info(
                 f"[Scenario2-Time] dpid={datapath.id}: "
-                f"DROP tcp_dst={tcp_dst} → {config.INTERNAL_WEB_SERVER_IP} (OFF-HOURS)"
+                f"DROP tcp_dst={tcp_dst} → {config.INTERNAL_WEB_SERVER_IP} from Guest {config.GUEST_SUBNET} (OFF-HOURS)"
             )
 
     # Vòng lặp kiểm tra định kỳ
