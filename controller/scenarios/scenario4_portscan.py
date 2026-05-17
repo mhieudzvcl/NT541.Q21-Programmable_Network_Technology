@@ -87,7 +87,7 @@ class PortScanDetection:
             ipv4_src=ip_src,
             ipv4_dst=config.QUARANTINE_SERVER_IP
         )
-        actions = [ofp_parser.OFPActionOutput(ofp.OFPP_FLOOD)]
+        actions = [ofp_parser.OFPActionOutput(ofp.OFPP_NORMAL)]
 
         # Override: ALLOW traffic từ ip_src đến Quarantine Server (exception rule)
         # Priority cao hơn DROP để override

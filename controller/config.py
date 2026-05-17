@@ -38,7 +38,7 @@ QUARANTINE_DURATION  = 300       # Thời gian cách ly (giây)
 AUTH_SERVER_IP   = "10.0.0.200"  # IP của Authentication Server
 AUTH_SERVER_PORT = 8080          # Port của Authentication Server
 NAC_ALLOW_DNS_PORT = 53          # Cho phép DNS kể cả chưa xác thực
-ENABLE_NAC       = False         # Cờ BẬT/TẮT kịch bản 5 (Để False khi test KB 1-4)
+ENABLE_NAC       = True         # Cờ BẬT/TẮT kịch bản 5 (Để False khi test KB 1-4)
 
 # Cấu hình REST API
 REST_LISTEN_HOST = "0.0.0.0"

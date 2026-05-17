@@ -103,7 +103,7 @@ class NACPortal:
             ipv4_dst=config.AUTH_SERVER_IP,
             tcp_dst=config.AUTH_SERVER_PORT
         )
-        actions_allow = [ofp_parser.OFPActionOutput(ofp.OFPP_FLOOD)]
+        actions_allow = [ofp_parser.OFPActionOutput(ofp.OFPP_NORMAL)]
         allow_auth_mod = ofp_parser.OFPFlowMod(
             datapath=datapath,
             priority=config.DROP_PRIORITY + 10,

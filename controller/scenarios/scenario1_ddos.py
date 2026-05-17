@@ -123,6 +123,7 @@ class DDoSMitigation:
         self.mon.blocked_ips.pop(ip_src, None)
         # Reset bộ đếm ICMP để kỳ flood tiếp theo được đếm sạch từ đầu
         self.mon.icmp_counter.pop(ip_src, None)
+        self.mon.syn_counter.pop(ip_src, None)
         logger.info(f"[Scenario1-DDoS] Block expired: ip={ip_src} dpid={dpid} \u2192 IP is now FREE again")
 
     def get_status(self):
